@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Waste Monitoring</title>
+<style>
+:root{--bg:#f6f7f9;--surface:#fff;--text:#0f172a;--muted:#64748b;--line:#e5e7eb;--brand:#0b3d6e;--ok:#15803d;--okbg:#dcfce7;--bad:#b91c1c;--badbg:#fee2e2;--soft:#eef2f7;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1220;--surface:#111a2b;--text:#e8edf5;--muted:#93a1b8;--line:#22304a;--brand:#5fa8e8;--ok:#4ade80;--okbg:#14301f;--bad:#f87171;--badbg:#3a1618;--soft:#18243a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1220;--surface:#111a2b;--text:#e8edf5;--muted:#93a1b8;--line:#22304a;--brand:#5fa8e8;--ok:#4ade80;--okbg:#14301f;--bad:#f87171;--badbg:#3a1618;--soft:#18243a;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.top{background:var(--surface);border-bottom:1px solid var(--line)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:600}
+.mark{width:30px;height:30px;border-radius:8px;background:var(--brand);display:grid;place-items:center;color:#fff;font-size:15px}
+.sub{color:var(--muted);font-size:13px;font-weight:400}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);padding:8px 14px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
+.btn:hover{background:var(--soft)}
+main{padding:28px 0 48px}
+h1{font-size:22px;margin:0 0 2px;letter-spacing:-.01em}
+.date{color:var(--muted);margin:0 0 22px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.lbl{color:var(--muted);font-size:13px}
+.num{font-size:32px;font-weight:600;letter-spacing:-.02em;margin-top:4px}
+.num small{font-size:14px;color:var(--muted);font-weight:400}
+.prog{margin:14px 0 26px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.track{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;margin-top:10px}
+.fill{height:100%;background:var(--brand);border-radius:99px;transition:width .5s}
+.tools{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-bottom:12px}
+.chips{display:flex;gap:6px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:0 0 20px}
+.tab{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);padding:10px 14px;font:inherit;font-size:14px;cursor:pointer}
+.tab.on{border-bottom-color:var(--brand);color:var(--text);font-weight:600}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:6px 14px;border-radius:99px;font:inherit;font-size:13px;cursor:pointer}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.on{color:#0b1220}}
+:root[data-theme="dark"] .chip.on{color:#0b1220}
+input[type=search]{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:8px 12px;font:inherit;font-size:13px;min-width:220px}
+.report-filters{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px;margin:12px 0}
+.report-filters label{display:grid;gap:4px;color:var(--muted);font-size:12px}
+.report-filters input,.report-filters select{width:100%;min-width:0;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px}
+.report-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 12px}
+.tablebox{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:640px}
+#reportTable{min-width:1200px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:500;text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--soft)}
+td{padding:14px 16px;border-bottom:1px solid var(--line)}
+tr:last-child td{border-bottom:0}
+.name{font-weight:500}.area{color:var(--muted);font-size:13px}
+.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:500}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.ok{color:var(--ok);background:var(--okbg)}.bad{color:var(--bad);background:var(--badbg)}
+.week{display:flex;gap:4px}
+.d{width:18px;height:18px;border-radius:5px;background:var(--soft)}
+.d.y{background:var(--ok);opacity:.85}.d.n{background:var(--bad);opacity:.7}
+.foot{color:var(--muted);font-size:12px;margin-top:14px}
+@media(max-width:640px){.cards{grid-template-columns:1fr}.bar .sub{display:none}}
+@media(max-width:760px){.report-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:440px){.report-filters{grid-template-columns:1fr}.report-actions{align-items:flex-start;flex-direction:column}}
+section[hidden]{display:none}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap bar">
+  <div class="logo"><div class="mark">♻</div><div>Waste Monitoring<div class="sub">Pemantauan input harian</div></div></div>
+  <button class="btn" id="refresh">Perbarui data</button>
+</div></header>
+
+<main class="wrap">
+  <div class="tabs" role="tablist" aria-label="Tampilan pelaporan">
+    <button class="tab on" id="tabAreas" role="tab" aria-selected="true" aria-controls="areaView">Ringkasan Area</button>
+    <button class="tab" id="tabReports" role="tab" aria-selected="false" aria-controls="reportsView">Semua Pelaporan</button>
+  </div>
+
+  <section id="areaView" role="tabpanel" aria-labelledby="tabAreas">
+    <h1 id="pageTitle">Status Laporan per Area Hari Ini</h1>
+    <p class="date" id="today"></p>
+
+    <section class="cards">
+      <div class="card"><div class="lbl" id="okLabel">Sudah lapor hari ini</div><div class="num" id="nOk" style="color:var(--ok)">0</div></div>
+      <div class="card"><div class="lbl" id="badLabel">Belum lapor hari ini</div><div class="num" id="nBad" style="color:var(--bad)">0</div></div>
+      <div class="card"><div class="lbl">Total area</div><div class="num" id="nAll">0</div></div>
+    </section>
+
+    <section class="prog">
+      <div style="display:flex;justify-content:space-between"><span class="lbl" id="complianceLabel">Kepatuhan pelaporan hari ini</span><strong id="pct">0%</strong></div>
+      <div class="track"><div class="fill" id="fill" style="width:0"></div></div>
+    </section>
+
+    <div class="tools">
+      <div class="chips" id="dayChips" aria-label="Pilih tanggal">
+        <button class="chip on" data-day="today">Hari ini</button>
+        <button class="chip" data-day="yesterday">Kemarin</button>
+      </div>
+      <div class="chips" id="chips">
+        <button class="chip on" data-f="all">Semua area</button>
+        <button class="chip" data-f="ok">Sudah lapor</button>
+        <button class="chip" data-f="bad">Belum lapor</button>
+      </div>
+      <input type="search" id="q" placeholder="Cari area…">
+    </div>
+
+    <div class="tablebox"><table>
+      <thead><tr><th>Area sumber limbah</th><th>Status</th><th>Jam laporan</th><th>7 hari terakhir</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <p class="foot" id="syncStatus" role="status" aria-live="polite">Menunggu data spreadsheet...</p>
+  </section>
+
+  <section id="reportsView" role="tabpanel" aria-labelledby="tabReports" hidden>
+    <h1>Semua Pelaporan</h1>
+    <div class="tools">
+      <input type="search" id="reportQ" placeholder="Cari seluruh kolom laporan…">
+      <span class="foot" id="reportCount"></span>
+    </div>
+    <div class="report-filters" id="reportFilters">
+      <label>Tanggal dari<input type="date" id="reportDateFrom"></label>
+      <label>Tanggal sampai<input type="date" id="reportDateTo"></label>
+      <label>Nama pelapor<select id="reportReporter"><option value="">Semua pelapor</option></select></label>
+      <label>Lokasi temuan<select id="reportLocation"><option value="">Semua lokasi</option></select></label>
+      <label>Finding<select id="reportFinding"><option value="">Semua finding</option></select></label>
+      <label>Area sumber limbah<select id="reportArea"><option value="">Semua area</option></select></label>
+      <label>Bukti foto<select id="reportEvidence"><option value="">Semua</option><option value="yes">Ada bukti</option><option value="no">Tanpa bukti</option></select></label>
+    </div>
+    <div class="report-actions">
+      <button class="btn" id="resetReportFilters" type="button">Reset filter</button>
+      <span class="foot" id="reportStatus" role="status" aria-live="polite">Menunggu data pelaporan...</span>
+    </div>
+    <div class="tablebox"><table id="reportTable">
+      <thead id="reportHead"></thead>
+      <tbody id="reportRows"></tbody>
+    </table></div>
+  </section>
+</main>
+
+<script>
+var API_URL="https://script.google.com/macros/s/AKfycbxFmm9MdyLBBcc2zRb7PBv0yaGjD_uKdpdANVEf457WlVss0q7mjuAoUYRw7kJuDkf4/exec";
+var DATA=[],REPORTS=[],REPORT_HEADERS=[],HAS_REPORTS=false;
+var filter="all",selectedDay="today",$=function(i){return document.getElementById(i)};
+
+function escapeHTML(value){
+  return String(value==null?"":value).replace(/[&<>"']/g,function(ch){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];
+  });
+}
+
+function statusForDay(row){
+  if(selectedDay==="yesterday")return row.y||(row.w.length&&Number(row.w[row.w.length-1])?"Sudah":null);
+  return row.t;
+}
+function updateDateLabels(){
+  var date=new Date();
+  if(selectedDay==="yesterday")date.setDate(date.getDate()-1);
+  var label=selectedDay==="yesterday"?"kemarin":"hari ini";
+  $("today").textContent=date.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  $("pageTitle").textContent="Status Laporan per Area "+(selectedDay==="yesterday"?"Kemarin":"Hari Ini");
+  $("okLabel").textContent="Sudah lapor "+label;
+  $("badLabel").textContent="Belum lapor "+label;
+  $("complianceLabel").textContent="Kepatuhan pelaporan "+label;
+}
+
+function render(){
+  var ok=DATA.filter(function(row){return !!statusForDay(row)}).length;
+  var all=DATA.length,pct=all?Math.round(ok/all*100):0;
+  $("nOk").textContent=ok;$("nBad").textContent=all-ok;$("nAll").textContent=all;
+  $("pct").textContent=pct+"%";$("fill").style.width=pct+"%";
+  var q=$("q").value.toLowerCase();
+  var list=DATA.filter(function(row){
+    var status=statusForDay(row);
+    if(filter==="ok"&&!status)return false;
+    if(filter==="bad"&&status)return false;
+    return String(row.n||"").toLowerCase().indexOf(q)>-1;
+  });
+  $("rows").innerHTML=list.length?list.map(function(row){
+    var status=statusForDay(row);
+    var days=row.w.map(function(value){return '<span class="d '+(value?'y':'n')+'"></span>'}).join("")+'<span class="d '+(row.t?'y':'')+'"></span>';
+    return '<tr><td class="name">'+escapeHTML(row.n)+'</td><td><span class="badge '+(status?'ok">Sudah lapor':'bad">Belum lapor')+'</span></td><td>'+escapeHTML(status||"–")+'</td><td><div class="week">'+days+'</div></td></tr>';
+  }).join(""):'<tr><td colspan="4" style="text-align:center;color:var(--muted)">Tidak ada data</td></tr>';
+}
+
+function reportCell(value,header){
+  var text=String(value==null?"":value);
+  if(!text)return "–";
+  if(/bukti|foto/i.test(header)){
+    var links=text.match(/https?:\/\/[^\s,]+/gi);
+    if(links&&links.length){
+      return links.map(function(url,index){
+        return '<a href="'+escapeHTML(url)+'" target="_blank" rel="noopener">Foto '+(index+1)+'</a>';
+      }).join(" · ");
+    }
+  }
+  return escapeHTML(text);
+}
+
+function normalizedHeader(value){
+  return String(value||"").trim().toLowerCase().replace(/\s+/g," ");
+}
+
+function reportValue(report,expectedHeader){
+  var expected=normalizedHeader(expectedHeader);
+  for(var i=0;i<REPORT_HEADERS.length;i++){
+    var header=REPORT_HEADERS[i];
+    if(normalizedHeader(header)===expected){
+      var value=report[header];
+      return String(value==null?"":value).trim();
+    }
+  }
+  return "";
+}
+
+function populateReportSelect(selectId,headerName,defaultLabel){
+  var select=$(selectId),values={};
+  REPORTS.forEach(function(report){
+    var value=reportValue(report,headerName);
+    if(value)values[value]=true;
+  });
+  var selected=select.value;
+  var options=Object.keys(values).sort().map(function(value){
+    return '<option value="'+escapeHTML(value)+'">'+escapeHTML(value)+'</option>';
+  }).join("");
+  select.innerHTML='<option value="">'+escapeHTML(defaultLabel)+'</option>'+options;
+  if(values[selected])select.value=selected;
+}
+
+function populateReportFilters(){
+  populateReportSelect("reportReporter","Nama Pelapor","Semua pelapor");
+  populateReportSelect("reportLocation","Lokasi Temuan","Semua lokasi");
+  populateReportSelect("reportFinding","Apa finding / Temuan abnormalitas yang terjadi","Semua finding");
+  populateReportSelect("reportArea","Area Sumber Limbah","Semua area");
+}
+
+function renderReports(){
+  var q=$("reportQ").value.toLowerCase();
+  if(!HAS_REPORTS||!REPORT_HEADERS.length){
+    $("reportHead").innerHTML="";
+    $("reportRows").innerHTML='<tr><td style="text-align:center;color:var(--muted)">Data semua pelaporan belum tersedia dari endpoint. Deploy Apps Script terbaru.</td></tr>';
+    $("reportCount").textContent="";
+    return;
+  }
+  var dateFrom=$("reportDateFrom").value,dateTo=$("reportDateTo").value;
+  var reporter=$("reportReporter").value,location=$("reportLocation").value;
+  var finding=$("reportFinding").value,area=$("reportArea").value;
+  var evidence=$("reportEvidence").value;
+  var list=REPORTS.filter(function(report){
+    var reportDate=reportValue(report,"Tanggal Pelaporan").slice(0,10);
+    var reportName=reportValue(report,"Nama Pelapor");
+    var reportLocation=reportValue(report,"Lokasi Temuan");
+    var reportFinding=reportValue(report,"Apa finding / Temuan abnormalitas yang terjadi");
+    var reportArea=reportValue(report,"Area Sumber Limbah");
+    var reportEvidence=reportValue(report,"Bukti / Foto (Jika ada)");
+    if(dateFrom&&(!reportDate||reportDate<dateFrom))return false;
+    if(dateTo&&(!reportDate||reportDate>dateTo))return false;
+    if(reporter&&reportName!==reporter)return false;
+    if(location&&reportLocation!==location)return false;
+    if(finding&&reportFinding!==finding)return false;
+    if(area&&reportArea!==area)return false;
+    if(evidence==="yes"&&!reportEvidence)return false;
+    if(evidence==="no"&&reportEvidence)return false;
+    return REPORT_HEADERS.map(function(header){return String(report[header]||"")}).join(" ").toLowerCase().indexOf(q)>-1;
+  });
+  $("reportHead").innerHTML="<tr>"+REPORT_HEADERS.map(function(header){return "<th>"+escapeHTML(header)+"</th>"}).join("")+"</tr>";
+  $("reportRows").innerHTML=list.length?list.map(function(report){
+    return "<tr>"+REPORT_HEADERS.map(function(header){return "<td>"+reportCell(report[header],header)+"</td>"}).join("")+"</tr>";
+  }).join(""):'<tr><td colspan="'+REPORT_HEADERS.length+'" style="text-align:center;color:var(--muted)">Tidak ada laporan</td></tr>';
+  $("reportCount").textContent=list.length+" laporan ditemukan";
+  $("reportStatus").textContent="Menampilkan "+list.length+" dari "+REPORTS.length+" laporan";
+}
+
+function activateTab(showReports){
+  $("areaView").hidden=showReports;
+  $("reportsView").hidden=!showReports;
+  $("tabAreas").classList.toggle("on",!showReports);
+  $("tabReports").classList.toggle("on",showReports);
+  $("tabAreas").setAttribute("aria-selected",String(!showReports));
+  $("tabReports").setAttribute("aria-selected",String(showReports));
+  if(showReports)renderReports();
+}
+
+$("dayChips").addEventListener("click",function(event){
+  var button=event.target.closest(".chip");if(!button)return;
+  selectedDay=button.dataset.day;
+  [].forEach.call($("dayChips").querySelectorAll(".chip"),function(chip){chip.classList.toggle("on",chip===button)});
+  updateDateLabels();render();
+});
+$("chips").addEventListener("click",function(event){
+  var button=event.target.closest(".chip");if(!button)return;
+  filter=button.dataset.f;
+  [].forEach.call($("chips").querySelectorAll(".chip"),function(chip){chip.classList.toggle("on",chip===button)});
+  render();
+});
+$("tabAreas").addEventListener("click",function(){activateTab(false)});
+$("tabReports").addEventListener("click",function(){activateTab(true)});
+$("q").addEventListener("input",render);
+$("reportQ").addEventListener("input",renderReports);
+[
+  "reportDateFrom","reportDateTo","reportReporter","reportLocation",
+  "reportFinding","reportArea","reportEvidence"
+].forEach(function(id){$(id).addEventListener("input",renderReports);$(id).addEventListener("change",renderReports)});
+$("resetReportFilters").addEventListener("click",function(){
+  ["reportDateFrom","reportDateTo","reportReporter","reportLocation","reportFinding","reportArea","reportEvidence","reportQ"]
+    .forEach(function(id){$(id).value=""});
+  renderReports();
+});
+$("refresh").addEventListener("click",loadData);
+updateDateLabels();
+
+function loadData(){
+  var button=$("refresh");
+  button.disabled=true;
+  button.textContent="Memuat...";
+  $("syncStatus").textContent="Mengambil data dari spreadsheet...";
+  $("syncStatus").style.color="";
+  var callbackName="__wasteMonitoring"+Date.now();
+  var script=document.createElement("script");
+  var finished=false,received=false;
+  var timeout=setTimeout(function(){fail("Waktu tunggu habis saat menghubungi Apps Script.");},15000);
+  function cleanup(){
+    if(finished)return;
+    finished=true;
+    clearTimeout(timeout);
+    delete window[callbackName];
+    if(script.parentNode)script.parentNode.removeChild(script);
+    button.disabled=false;
+    button.textContent="Perbarui data";
+  }
+  function fail(message){
+    DATA=[];
+    REPORTS=[];REPORT_HEADERS=[];HAS_REPORTS=false;
+    render();
+    renderReports();
+    $("syncStatus").textContent="Gagal memuat data: "+message;
+    $("syncStatus").style.color="var(--bad)";
+    cleanup();
+  }
+  window[callbackName]=function(payload){
+    received=true;
+    try{
+      if(!payload||!payload.ok)throw new Error(payload&&payload.error?payload.error:"Apps Script mengembalikan error.");
+      if(!Array.isArray(payload.data))throw new Error("Format respons tidak memiliki daftar data.");
+      if(payload.groupBy==="area"){
+        DATA=payload.data.map(function(row){
+          return {
+            n:String(row.n||""),
+            t:row.t?String(row.t):null,
+            y:row.y?String(row.y):null,
+            w:Array.isArray(row.w)?row.w.map(function(day){return Number(day)?1:0;}):[]
+          };
+        });
+      }else{
+        var grouped={};
+        payload.data.forEach(function(row){
+          var parts=String(row.a||"").split("/");
+          var areaName=String(parts.shift()||"").trim();
+          if(!areaName)return;
+          var key=areaName.toLowerCase().replace(/\s+/g," ");
+          var area=grouped[key]||{n:areaName,t:null,y:null,w:[]};
+          var time=row.t?String(row.t):null;
+          if(time&&(!area.t||area.t==="Sudah"||time>area.t))area.t=time;
+          if(Array.isArray(row.w))row.w.forEach(function(day,index){
+            area.w[index]=(Number(area.w[index])||Number(day))?1:0;
+          });
+          if(Array.isArray(row.w)&&Number(row.w[row.w.length-1]))area.y="Sudah";
+          grouped[key]=area;
+        });
+        DATA=Object.keys(grouped).map(function(key){
+          return grouped[key];
+        });
+      }
+      HAS_REPORTS=Array.isArray(payload.reports);
+      REPORT_HEADERS=Array.isArray(payload.reportHeaders)?payload.reportHeaders.map(String):[];
+      REPORTS=HAS_REPORTS?payload.reports:[];
+      populateReportFilters();
+      render();
+      renderReports();
+      $("syncStatus").textContent="Tersambung"+(payload.updated?". Diperbarui: "+payload.updated:"");
+      $("syncStatus").style.color="var(--ok)";
+      cleanup();
+    }catch(error){fail(error.message);}
+  };
+  script.onerror=function(){fail("Endpoint masih mengirim JSON biasa. Pasang MonitoringInputHarian.gs di Apps Script dan deploy versi baru.");};
+  script.onload=function(){
+    if(!received)fail("Endpoint belum mendukung JSONP. Perbarui kode Apps Script dan deploy ulang.");
+  };
+  script.src=API_URL+"?callback="+encodeURIComponent(callbackName)+"&t="+Date.now();
+  document.head.appendChild(script);
+}
+
+loadData();
+</script>
+</body>
+</html>
