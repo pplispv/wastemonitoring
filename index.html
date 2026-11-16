@@ -105,7 +105,7 @@ section[hidden]{display:none}
     </div>
 
     <div class="tablebox"><table>
-      <thead><tr><th>Area sumber limbah</th><th>Status</th><th>Jam laporan</th><th>7 hari terakhir</th></tr></thead>
+      <thead><tr><th>Area sumber limbah</th><th>Status</th><th>Jam laporan (WIB)</th><th id="findingCountHeader">Jumlah finding hari ini</th><th>7 hari terakhir</th></tr></thead>
       <tbody id="rows"></tbody>
     </table></div>
     <p class="foot" id="syncStatus" role="status" aria-live="polite">Menunggu data spreadsheet...</p>
@@ -148,19 +148,55 @@ function escapeHTML(value){
   });
 }
 
+function toWibTime(value,sourceTimeZone){
+  var text=String(value==null?"":value);
+  if(!text||sourceTimeZone==="Asia/Jakarta"||sourceTimeZone!=="Asia/Jayapura")return text;
+  var full=/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})(?::(\d{2}))?$/.exec(text);
+  if(full){
+    var date=new Date(Date.UTC(Number(full[1]),Number(full[2])-1,Number(full[3]),Number(full[4])-2,Number(full[5]),Number(full[6]||0)));
+    return [date.getUTCFullYear(),String(date.getUTCMonth()+1).padStart(2,"0"),String(date.getUTCDate()).padStart(2,"0")].join("-")+" "+
+      [String(date.getUTCHours()).padStart(2,"0"),String(date.getUTCMinutes()).padStart(2,"0"),String(date.getUTCSeconds()).padStart(2,"0")].join(":");
+  }
+  var clock=/^(\d{2}):(\d{2})$/.exec(text);
+  if(clock){
+    var minutes=(Number(clock[1])*60+Number(clock[2])-120+1440)%1440;
+    return String(Math.floor(minutes/60)).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0");
+  }
+  return text;
+}
+
 function statusForDay(row){
   if(selectedDay==="yesterday")return row.y||(row.w.length&&Number(row.w[row.w.length-1])?"Sudah":null);
   return row.t;
 }
+function wibDateKey(offsetDays){
+  var parts=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  var values={};
+  parts.forEach(function(part){values[part.type]=part.value});
+  var date=new Date(Date.UTC(Number(values.year),Number(values.month)-1,Number(values.day)+(offsetDays||0)));
+  return [date.getUTCFullYear(),String(date.getUTCMonth()+1).padStart(2,"0"),String(date.getUTCDate()).padStart(2,"0")].join("-");
+}
 function updateDateLabels(){
-  var date=new Date();
-  if(selectedDay==="yesterday")date.setDate(date.getDate()-1);
+  var dateParts=wibDateKey(selectedDay==="yesterday"?-1:0).split("-");
+  var date=new Date(Date.UTC(Number(dateParts[0]),Number(dateParts[1])-1,Number(dateParts[2]),12));
   var label=selectedDay==="yesterday"?"kemarin":"hari ini";
-  $("today").textContent=date.toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  $("today").textContent=new Intl.DateTimeFormat("id-ID",{timeZone:"Asia/Jakarta",weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(date);
   $("pageTitle").textContent="Status Laporan per Area "+(selectedDay==="yesterday"?"Kemarin":"Hari Ini");
   $("okLabel").textContent="Sudah lapor "+label;
   $("badLabel").textContent="Belum lapor "+label;
   $("complianceLabel").textContent="Kepatuhan pelaporan "+label;
+  $("findingCountHeader").textContent="Jumlah finding "+label;
+}
+
+function findingCountForDay(row){
+  var count=selectedDay==="yesterday"?row.cy:row.c;
+  if(typeof count==="number")return count;
+  var dateKey=wibDateKey(selectedDay==="yesterday"?-1:0);
+  var areaName=String(row.n||"").trim().toLowerCase().replace(/\s+/g," ");
+  return REPORTS.filter(function(report){
+    return reportValue(report,"Tanggal Pelaporan").slice(0,10)===dateKey &&
+      reportValue(report,"Area Sumber Limbah").toLowerCase().replace(/\s+/g," ")===areaName;
+  }).length;
 }
 
 function render(){
@@ -178,8 +214,8 @@ function render(){
   $("rows").innerHTML=list.length?list.map(function(row){
     var status=statusForDay(row);
     var days=row.w.map(function(value){return '<span class="d '+(value?'y':'n')+'"></span>'}).join("")+'<span class="d '+(row.t?'y':'')+'"></span>';
-    return '<tr><td class="name">'+escapeHTML(row.n)+'</td><td><span class="badge '+(status?'ok">Sudah lapor':'bad">Belum lapor')+'</span></td><td>'+escapeHTML(status||"–")+'</td><td><div class="week">'+days+'</div></td></tr>';
-  }).join(""):'<tr><td colspan="4" style="text-align:center;color:var(--muted)">Tidak ada data</td></tr>';
+    return '<tr><td class="name">'+escapeHTML(row.n)+'</td><td><span class="badge '+(status?'ok">Sudah lapor':'bad">Belum lapor')+'</span></td><td>'+escapeHTML(status||"–")+'</td><td>'+findingCountForDay(row)+'</td><td><div class="week">'+days+'</div></td></tr>';
+  }).join(""):'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Tidak ada data</td></tr>';
 }
 
 function reportCell(value,header){
@@ -341,12 +377,15 @@ function loadData(){
     try{
       if(!payload||!payload.ok)throw new Error(payload&&payload.error?payload.error:"Apps Script mengembalikan error.");
       if(!Array.isArray(payload.data))throw new Error("Format respons tidak memiliki daftar data.");
+      var sourceTimeZone=payload.timeZone||"Asia/Jayapura";
       if(payload.groupBy==="area"){
         DATA=payload.data.map(function(row){
           return {
             n:String(row.n||""),
-            t:row.t?String(row.t):null,
-            y:row.y?String(row.y):null,
+            t:row.t?toWibTime(row.t,sourceTimeZone):null,
+            y:row.y?toWibTime(row.y,sourceTimeZone):null,
+            c:typeof row.c==="number"?row.c:null,
+            cy:typeof row.cy==="number"?row.cy:null,
             w:Array.isArray(row.w)?row.w.map(function(day){return Number(day)?1:0;}):[]
           };
         });
@@ -357,8 +396,8 @@ function loadData(){
           var areaName=String(parts.shift()||"").trim();
           if(!areaName)return;
           var key=areaName.toLowerCase().replace(/\s+/g," ");
-          var area=grouped[key]||{n:areaName,t:null,y:null,w:[]};
-          var time=row.t?String(row.t):null;
+          var area=grouped[key]||{n:areaName,t:null,y:null,c:null,cy:null,w:[]};
+          var time=row.t?toWibTime(row.t,sourceTimeZone):null;
           if(time&&(!area.t||area.t==="Sudah"||time>area.t))area.t=time;
           if(Array.isArray(row.w))row.w.forEach(function(day,index){
             area.w[index]=(Number(area.w[index])||Number(day))?1:0;
@@ -372,11 +411,19 @@ function loadData(){
       }
       HAS_REPORTS=Array.isArray(payload.reports);
       REPORT_HEADERS=Array.isArray(payload.reportHeaders)?payload.reportHeaders.map(String):[];
-      REPORTS=HAS_REPORTS?payload.reports:[];
+      REPORTS=HAS_REPORTS?payload.reports.map(function(report){
+        var normalized={};
+        Object.keys(report).forEach(function(header){
+          normalized[header]=normalizedHeader(header)==="timestamp"
+            ?toWibTime(report[header],sourceTimeZone)
+            :report[header];
+        });
+        return normalized;
+      }):[];
       populateReportFilters();
       render();
       renderReports();
-      $("syncStatus").textContent="Tersambung"+(payload.updated?". Diperbarui: "+payload.updated:"");
+      $("syncStatus").textContent="Tersambung"+(payload.updated?". Diperbarui: "+toWibTime(payload.updated,sourceTimeZone)+" WIB":"");
       $("syncStatus").style.color="var(--ok)";
       cleanup();
     }catch(error){fail(error.message);}
