@@ -3,440 +3,487 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Waste Monitoring</title>
+<title>PPLI Operations Control</title>
+<meta name="theme-color" content="#032b1a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f7f9;--surface:#fff;--text:#0f172a;--muted:#64748b;--line:#e5e7eb;--brand:#0b3d6e;--ok:#15803d;--okbg:#dcfce7;--bad:#b91c1c;--badbg:#fee2e2;--soft:#eef2f7;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1220;--surface:#111a2b;--text:#e8edf5;--muted:#93a1b8;--line:#22304a;--brand:#5fa8e8;--ok:#4ade80;--okbg:#14301f;--bad:#f87171;--badbg:#3a1618;--soft:#18243a;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#0b1220;--surface:#111a2b;--text:#e8edf5;--muted:#93a1b8;--line:#22304a;--brand:#5fa8e8;--ok:#4ade80;--okbg:#14301f;--bad:#f87171;--badbg:#3a1618;--soft:#18243a;color-scheme:dark}
+:root{--green:#00873d;--forest:#0a5a33;--deep:#032b1a;--lime:#a6d33a;--mint:#e8f4ec;--ink:#0c1f17;--muted:#4f6359;--line:#dce7e0;--bg:#f4f8f5;
+ --font:"DM Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--head:"Outfit","DM Sans",system-ui,sans-serif}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.top{background:var(--surface);border-bottom:1px solid var(--line)}
-.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;height:64px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:600}
-.mark{width:30px;height:30px;border-radius:8px;background:var(--brand);display:grid;place-items:center;color:#fff;font-size:15px}
-.sub{color:var(--muted);font-size:13px;font-weight:400}
-.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);padding:8px 14px;border-radius:8px;font:inherit;font-size:13px;cursor:pointer}
-.btn:hover{background:var(--soft)}
-main{padding:28px 0 48px}
-h1{font-size:22px;margin:0 0 2px;letter-spacing:-.01em}
-.date{color:var(--muted);margin:0 0 22px}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
-.lbl{color:var(--muted);font-size:13px}
-.num{font-size:32px;font-weight:600;letter-spacing:-.02em;margin-top:4px}
-.num small{font-size:14px;color:var(--muted);font-weight:400}
-.prog{margin:14px 0 26px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
-.track{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;margin-top:10px}
-.fill{height:100%;background:var(--brand);border-radius:99px;transition:width .5s}
-.tools{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-bottom:12px}
-.chips{display:flex;gap:6px}
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:0 0 20px}
-.tab{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--muted);padding:10px 14px;font:inherit;font-size:14px;cursor:pointer}
-.tab.on{border-bottom-color:var(--brand);color:var(--text);font-weight:600}
-.chip{border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:6px 14px;border-radius:99px;font:inherit;font-size:13px;cursor:pointer}
-.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.on{color:#0b1220}}
-:root[data-theme="dark"] .chip.on{color:#0b1220}
-input[type=search]{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:8px 12px;font:inherit;font-size:13px;min-width:220px}
-.report-filters{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px;margin:12px 0}
-.report-filters label{display:grid;gap:4px;color:var(--muted);font-size:12px}
-.report-filters input,.report-filters select{width:100%;min-width:0;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px}
-.report-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:10px 0 12px}
-.tablebox{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:640px}
-#reportTable{min-width:1200px}
-th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:500;text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--soft)}
-td{padding:14px 16px;border-bottom:1px solid var(--line)}
-tr:last-child td{border-bottom:0}
-.name{font-weight:500}.area{color:var(--muted);font-size:13px}
-.badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:500}
-.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-.ok{color:var(--ok);background:var(--okbg)}.bad{color:var(--bad);background:var(--badbg)}
-.week{display:flex;gap:4px}
-.d{width:18px;height:18px;border-radius:5px;background:var(--soft)}
-.d.y{background:var(--ok);opacity:.85}.d.n{background:var(--bad);opacity:.7}
-.foot{color:var(--muted);font-size:12px;margin-top:14px}
-@media(max-width:640px){.cards{grid-template-columns:1fr}.bar .sub{display:none}}
-@media(max-width:760px){.report-filters{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:440px){.report-filters{grid-template-columns:1fr}.report-actions{align-items:flex-start;flex-direction:column}}
-section[hidden]{display:none}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{margin:0;background:#fff;color:var(--ink);font-family:var(--font);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+.brand{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+.brand b{font-family:var(--head);font-size:19px;font-weight:600;line-height:1.1;display:block}
+.brand small{font-size:12.5px;color:var(--muted)}
+.links{display:flex;align-items:center;gap:30px}
+.links a:not(.btn){color:var(--ink);text-decoration:none;font-weight:500;font-size:15.5px;padding:6px 0;border-bottom:2px solid transparent}
+.links a:not(.btn):hover{border-color:var(--green)}
+.btn{display:inline-flex;align-items:center;gap:10px;font:inherit;font-weight:600;font-size:16px;padding:15px 30px;border-radius:999px;text-decoration:none;border:2px solid transparent;cursor:pointer;transition:background .2s,color .2s,border-color .2s}
+.btn.pri{background:var(--lime);color:#10240a}
+.btn.pri:hover{background:#bde356}
+.btn.ghost{border-color:rgba(255,255,255,.6);color:#fff}
+.btn.ghost:hover{background:rgba(255,255,255,.14)}
+.links .btn{padding:10px 22px;font-size:15px;background:var(--green);color:#fff}
+.links .btn:hover{background:var(--forest)}
+
+/* Hero */
+.hero{position:relative;min-height:clamp(540px,86vh,760px);display:flex;align-items:center;color:#fff;background:var(--deep);overflow:hidden}
+.hero .scene,.hero .photo{position:absolute;inset:0;width:100%;height:100%}
+.hero .photo{object-fit:cover}
+.hero .shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,43,26,.95) 0%,rgba(3,43,26,.75) 40%,rgba(3,43,26,.05) 85%)}
+.hero .wrap{position:relative;width:100%;padding-top:20px;padding-bottom:20px}
+.hero h1{font-family:var(--head);font-weight:600;font-size:clamp(40px,6.6vw,76px);line-height:1.02;letter-spacing:-.02em;margin:0 0 22px;max-width:15ch}
+.hero p{font-size:clamp(17px,2.2vw,21px);max-width:46ch;margin:0 0 34px;color:#d3e6da}
+.cta{display:flex;flex-wrap:wrap;gap:14px}
+
+/* Apps */
+#aplikasi{padding:88px 0 96px}
+.head{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:flex-end;margin-bottom:30px}
+.head h2,.band h2{font-family:var(--head);font-size:clamp(32px,4.4vw,48px);line-height:1.05;letter-spacing:-.015em;margin:0 0 10px;font-weight:600;color:var(--deep)}
+.head p{margin:0;color:var(--muted);max-width:46ch;font-size:17px}
+.search{display:flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:0 18px;width:min(100%,300px)}
+.search:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(0,135,61,.15)}
+.search svg{color:var(--muted);flex:none}
+.search input{border:0;outline:0;background:transparent;font:inherit;font-size:16px;padding:13px 0;width:100%;color:var(--ink)}
+.tabs{display:flex;gap:28px;overflow-x:auto;border-bottom:1px solid var(--line);margin-bottom:36px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;font:inherit;font-weight:500;font-size:16px;color:var(--muted);background:none;border:0;border-bottom:3px solid transparent;padding:12px 0;margin-bottom:-1px;cursor:pointer}
+.tab:hover{color:var(--ink)}
+.tab[aria-pressed="true"]{color:var(--green);border-color:var(--green);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:32px 28px}
+.card{display:flex;flex-direction:column;color:inherit;text-decoration:none;border-radius:18px;transition:transform .25s}
+.banner{position:relative;aspect-ratio:16/10;border-radius:18px;overflow:hidden;background:var(--deep)}
+.banner svg,.banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+a.card:hover .banner svg,a.card:hover .banner img{transform:scale(1.06)}
+.card.soon .banner{filter:grayscale(.8) brightness(.92)}
+.badge{position:absolute;top:14px;left:14px;z-index:1;display:inline-flex;align-items:center;gap:7px;background:#fff;color:var(--deep);font-size:13px;font-weight:600;padding:5px 12px;border-radius:999px}
+.badge i{width:8px;height:8px;border-radius:50%;background:var(--green)}
+.soon .badge i{background:#e0a21a}
+.body{display:flex;flex-direction:column;gap:6px;padding:18px 4px 0;flex:1}
+.body small{color:var(--green);font-size:14px;font-weight:600}
+.body h3{font-family:var(--head);font-size:25px;line-height:1.15;margin:0;font-weight:600;color:var(--deep)}
+.body p{margin:2px 0 0;color:var(--muted);font-size:16px}
+.open{margin-top:14px;display:flex;align-items:center;gap:10px;font-weight:600;font-size:15.5px;color:var(--deep)}
+.open .c{width:36px;height:36px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;transition:background .2s,transform .25s}
+a.card:hover .open .c{background:var(--lime);color:#10240a;transform:translateX(4px)}
+.soon .open{color:var(--muted);font-weight:500}
+.empty{grid-column:1/-1;text-align:center;padding:56px 16px;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:4px}
+a:focus-visible,.tab:focus-visible,.btn:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+
+/* Band */
+.band{background:var(--deep);color:#d3e6da;padding:84px 0;position:relative;overflow:hidden}
+.band::before{content:"";position:absolute;right:-120px;top:-120px;width:460px;height:460px;border-radius:50%;border:1px solid rgba(166,211,58,.25);box-shadow:0 0 0 60px rgba(166,211,58,.04),0 0 0 120px rgba(166,211,58,.03)}
+.band .wrap{position:relative;display:grid;grid-template-columns:1.1fr 1fr;gap:56px;align-items:center}
+.band h2{color:#fff}
+.band p{font-size:18px;max-width:46ch;margin:0}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.num{border-top:2px solid var(--lime);padding-top:16px}
+.num b{display:block;font-family:var(--head);font-size:clamp(40px,5vw,60px);line-height:1;font-weight:600;color:#fff}
+.num span{font-size:15px}
+
+/* Footer */
+footer{background:#021d11;color:#9fb8aa;padding:48px 0 calc(40px + env(safe-area-inset-bottom,0px));font-size:15px}
+footer .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:32px}
+footer b{color:#fff;font-family:var(--head);font-size:20px;font-weight:600;display:block;margin-bottom:6px}
+footer ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px 24px}
+footer a{color:#cfe3d6;text-decoration:none}
+footer a:hover{color:var(--lime)}
+footer h4{margin:0 0 10px;color:#fff;font-size:15px;font-weight:600}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+@media (max-width:820px){.band .wrap,footer .wrap{grid-template-columns:1fr;gap:36px}}
+@media (max-width:640px){.links a:not(.btn){display:none}.wrap{padding:0 20px}#aplikasi{padding:64px 0 72px}.band{padding:64px 0}.nums{gap:14px}.grid{gap:28px}}
+
+/* ===== Bagian Tentang PPLI ===== */
+.s{padding:80px 0}
+.lead{font-size:18px;color:var(--muted);margin:0 0 16px}
+.two{display:grid;grid-template-columns:1.1fr 1fr;gap:56px;align-items:center}
+
+/* kepemilikan */
+.own{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:28px}
+.own h3{margin:0 0 18px;font-family:var(--head);font-size:20px;font-weight:600;color:var(--deep)}
+.bar{display:flex;height:16px;border-radius:999px;overflow:hidden;background:var(--line)}
+.bar i{display:block}.bar .a{width:95%;background:var(--green)}.bar .b{width:5%;background:var(--lime)}
+.rows{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.rows b{display:block;font-family:var(--head);font-size:40px;line-height:1;font-weight:600;color:var(--deep)}
+.rows span{font-size:15px;color:var(--muted)}
+.rows .r2 b{color:#6d9a12}
+
+/* video */
+.vid{background:var(--deep);color:#d3e6da}
+.vid h2{color:#fff}
+.frame{position:relative;aspect-ratio:16/9;border-radius:20px;overflow:hidden;background:#0a3a24;border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 60px -30px rgba(0,0,0,.6)}
+.frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.poster{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;background:linear-gradient(135deg,#06452a,#13975b);color:#fff;border:0;width:100%;font:inherit;cursor:pointer}
+.play{width:84px;height:84px;border-radius:50%;background:var(--lime);color:#10240a;display:grid;place-items:center;transition:transform .2s}
+.poster:hover .play{transform:scale(1.08)}
+.poster span{font-family:var(--head);font-size:22px;font-weight:600}
+.poster small{font-size:15px;color:#d3e6da}
+
+/* grup */
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.fact{border:1px solid var(--line);border-radius:18px;padding:20px 22px;background:#fff}
+.fact b{display:block;font-family:var(--head);font-size:38px;line-height:1;color:var(--green);font-weight:600;margin-bottom:6px}
+.fact span{color:var(--muted);font-size:15.5px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.chip{padding:9px 16px;border-radius:999px;background:var(--mint);color:var(--forest);font-weight:500;font-size:15px}
+
+/* layanan */
+.svc{background:var(--bg)}
+.sub{margin:0 0 32px;color:var(--muted);font-size:17px;max-width:54ch}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.tile{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px 20px;text-decoration:none;color:var(--deep);font-weight:600;transition:transform .2s,border-color .2s,box-shadow .2s}
+.tile:hover{transform:translateY(-3px);border-color:#bcd3c4;box-shadow:0 16px 28px -20px rgba(3,43,26,.5)}
+.tile svg{flex:none;color:var(--green)}
+
+/* unduh + kontak */
+.dl{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+.find{background:var(--bg);border:1px solid var(--line);border-radius:20px;padding:28px}
+.find h3{margin:0 0 12px;font-family:var(--head);font-size:22px;font-weight:600;color:var(--deep)}
+.find p{margin:0 0 10px;color:var(--muted)}
+.find strong{color:var(--ink)}
+
+h2{font-family:var(--head);font-size:clamp(30px,4vw,44px);line-height:1.06;letter-spacing:-.015em;margin:0 0 14px;font-weight:600;color:var(--deep)}
+.btn.line{border-color:var(--green);color:var(--green);background:#fff}.btn.line:hover{background:var(--green);color:#fff}
+.poster:focus-visible,.tile:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+@media (max-width:820px){.two{grid-template-columns:1fr;gap:32px}}
+@media (max-width:640px){.s{padding:60px 0}.rows b{font-size:34px}}
+
+/* ===== Proyek: PTFI Smelter Gresik ===== */
+.illus{border-radius:20px;overflow:hidden;aspect-ratio:16/10;background:var(--deep);box-shadow:0 30px 60px -34px rgba(3,43,26,.6)}
+.illus svg{display:block;width:100%;height:100%}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:56px}
+.ptag{margin:36px 0 0;display:flex;flex-wrap:wrap;gap:10px 28px}
+.ptag div{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.ptag strong{font-family:var(--head);color:var(--deep);font-size:17px;font-weight:600;margin-right:4px}
+.role{margin-top:64px}
+.role h3{font-family:var(--head);font-size:clamp(24px,3vw,32px);line-height:1.1;margin:0 0 8px;font-weight:600;color:var(--deep)}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:24px}
+.rc{display:block;border:1px solid var(--line);border-radius:16px;padding:22px;background:#fff;text-decoration:none;color:inherit;transition:transform .2s,border-color .2s,box-shadow .2s}
+.rc:hover{transform:translateY(-3px);border-color:#bcd3c4;box-shadow:0 16px 28px -20px rgba(3,43,26,.5)}
+.rc b{display:block;font-family:var(--head);font-size:20px;font-weight:600;color:var(--deep);margin-bottom:6px}
+.rc span{color:var(--muted);font-size:15.5px}
+.rc:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+.vlist{display:flex;flex-wrap:wrap;gap:14px;margin-top:18px}
+.vt{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);color:#fff;border-radius:14px;padding:8px 18px 8px 8px;font:inherit;font-weight:500;cursor:pointer;text-align:left;transition:background .2s,border-color .2s}
+.vt:hover{background:rgba(255,255,255,.12)}
+.vt img{width:96px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;background:#0a3a24}
+.vt[aria-pressed="true"]{border-color:var(--lime);background:rgba(166,211,58,.16)}
+.vt:focus-visible,.vopen:focus-visible{outline:3px solid var(--lime);outline-offset:3px}
+.vopen{display:inline-block;margin-top:14px;color:var(--lime);font-weight:500;text-decoration:none;border-bottom:1px solid rgba(166,211,58,.5)}
+.vopen:hover{border-color:var(--lime)}
+.poster{background-color:#0a3a24}
+.vgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+.vmeta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-top:14px;color:#fff;font-weight:500}
+.vmeta .vopen{margin:0;font-size:15px}
+.vgrid .poster span{font-size:18px}
+@media (max-width:760px){.vgrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap bar">
-  <div class="logo"><div class="mark">♻</div><div>Waste Monitoring<div class="sub">Pemantauan input harian</div></div></div>
-  <button class="btn" id="refresh">Perbarui data</button>
-</div></header>
 
-<main class="wrap">
-  <div class="tabs" role="tablist" aria-label="Tampilan pelaporan">
-    <button class="tab on" id="tabAreas" role="tab" aria-selected="true" aria-controls="areaView">Ringkasan Area</button>
-    <button class="tab" id="tabReports" role="tab" aria-selected="false" aria-controls="reportsView">Semua Pelaporan</button>
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#">
+      <svg width="42" height="42" viewBox="0 0 42 42" aria-hidden="true"><rect width="42" height="42" rx="12" fill="#00873d"/><path d="M21 9c8 0 12 5 12 12 0 7-5 12-12 12-5 0-8-3-8-8 0-9 4-16 8-16z" fill="#fff"/><path d="M17 31c1-7 5-12 11-15" stroke="#00873d" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+      <span><b>PPLI Operations Control</b><small>PTFI Smelter Operation, Gresik</small></span>
+    </a>
+    <div class="links"><a href="#aplikasi">Aplikasi</a><a href="#tentang">Tentang</a><a href="#layanan">Layanan</a><a href="#proyek">Proyek</a><a href="#kontak">Kontak</a><a class="btn" href="#aplikasi">Buka aplikasi</a></div>
   </div>
+</nav>
 
-  <section id="areaView" role="tabpanel" aria-labelledby="tabAreas">
-    <h1 id="pageTitle">Status Laporan per Area Hari Ini</h1>
-    <p class="date" id="today"></p>
+<header class="hero">
+  <svg class="scene" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#02261a"/><stop offset=".5" stop-color="#0b6a3d"/><stop offset="1" stop-color="#c8e883"/></linearGradient>
+      <linearGradient id="sm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient>
+      <g id="tb"><path d="M-3 0L-1.4-118H1.4L3 0Z" fill="#eef7f1"/><g transform="translate(0 -120)"><circle r="5" fill="#fff"/><path id="bl" d="M-2 0L0-62L2 0Z" fill="#fff"/><use href="#bl" transform="rotate(120)"/><use href="#bl" transform="rotate(240)"/></g></g>
+      <g id="tr"><rect x="-3" y="-10" width="6" height="14" fill="#2c2a1a"/><circle cy="-26" r="19" fill="#22a05a"/><circle cx="-11" cy="-16" r="12" fill="#1a8548"/><circle cx="11" cy="-17" r="11" fill="#2bb866"/></g>
+    </defs>
+    <rect width="1440" height="700" fill="url(#sky)"/>
+    <circle cx="980" cy="480" r="150" fill="#eefab4" opacity=".4"/>
+    <path d="M0 480C200 420 380 460 560 430S900 410 1100 450 1340 440 1440 420V700H0Z" fill="#128a4e" opacity=".75"/>
+    <use href="#tb" transform="translate(640 448) scale(.55)"/><use href="#tb" transform="translate(760 438) scale(.8)"/><use href="#tb" transform="translate(870 430) scale(.62)"/><use href="#tb" transform="translate(1040 442) scale(.7)"/>
+    <g fill="url(#sm)"><ellipse cx="1150" cy="250" rx="80" ry="130"/><ellipse cx="1250" cy="200" rx="95" ry="140"/><ellipse cx="1350" cy="260" rx="70" ry="110"/></g>
+    <g fill="#052a1b">
+      <path d="M1130 540L1138 330H1162L1170 540Z"/><path d="M1230 540L1238 290H1264L1272 540Z"/><path d="M1330 540L1337 350H1358L1364 540Z"/>
+      <rect x="1090" y="450" width="340" height="100"/><rect x="1120" y="420" width="110" height="32"/>
+    </g>
+    <g fill="#d3e8da"><rect x="990" y="470" width="62" height="74" rx="4"/><rect x="1058" y="486" width="50" height="58" rx="4"/><ellipse cx="1021" cy="470" rx="31" ry="8" fill="#eaf5ee"/><ellipse cx="1083" cy="486" rx="25" ry="7" fill="#eaf5ee"/></g>
+    <g fill="#a6d33a" opacity=".95"><rect x="1105" y="472" width="14" height="8"/><rect x="1135" y="472" width="14" height="8"/><rect x="1165" y="472" width="14" height="8"/><rect x="1335" y="478" width="14" height="8"/><rect x="1365" y="478" width="14" height="8"/></g>
+    <path d="M0 610C300 568 600 612 900 586S1250 566 1440 596V700H0Z" fill="#064a2a"/>
+    <use href="#tr" transform="translate(640 600) scale(1.05)"/><use href="#tr" transform="translate(700 592) scale(.8)"/><use href="#tr" transform="translate(790 596) scale(1.2)"/><use href="#tr" transform="translate(880 586) scale(.9)"/>
+    <g><rect x="1010" y="590" width="88" height="40" fill="#a6d33a"/><rect x="1102" y="590" width="88" height="40" fill="#eef7f1"/><rect x="1194" y="590" width="88" height="40" fill="#00873d"/><rect x="1286" y="590" width="88" height="40" fill="#a6d33a"/><rect x="1056" y="550" width="88" height="40" fill="#00873d"/><rect x="1148" y="550" width="88" height="40" fill="#eef7f1"/><rect x="1240" y="550" width="88" height="40" fill="#a6d33a"/></g>
+    <rect y="640" width="1440" height="60" fill="#032b1a"/>
+  </svg>
+  <img class="photo" src="assets/hero.jpg" alt="" onerror="this.remove()">
+  <div class="shade"></div>
+  <div class="wrap">
+    <h1>Responsible waste management, end to end.</h1>
+    <p>Total waste solution for industry. One portal for PPLI's trackers, dashboards, and B3 logbook at PTFI Smelter Operation.</p>
+    <div class="cta"><a class="btn pri" href="#aplikasi">Lihat semua aplikasi</a><a class="btn ghost" href="#tentang">Tentang PPLI</a></div>
+  </div>
+</header>
 
-    <section class="cards">
-      <div class="card"><div class="lbl" id="okLabel">Sudah lapor hari ini</div><div class="num" id="nOk" style="color:var(--ok)">0</div></div>
-      <div class="card"><div class="lbl" id="badLabel">Belum lapor hari ini</div><div class="num" id="nBad" style="color:var(--bad)">0</div></div>
-      <div class="card"><div class="lbl">Total area</div><div class="num" id="nAll">0</div></div>
-    </section>
+<section id="aplikasi">
+  <div class="wrap">
+    <div class="head">
+      <div><h2>Aplikasi kami</h2><p>Pilih aplikasi untuk membukanya di tab baru.</p></div>
+      <label class="search">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Cari aplikasi" autocomplete="off" aria-label="Cari aplikasi">
+      </label>
+    </div>
+    <div class="tabs" id="tabs" role="group" aria-label="Filter kategori"></div>
+    <div class="grid" id="grid" aria-live="polite"></div>
+  </div>
+</section>
 
-    <section class="prog">
-      <div style="display:flex;justify-content:space-between"><span class="lbl" id="complianceLabel">Kepatuhan pelaporan hari ini</span><strong id="pct">0%</strong></div>
-      <div class="track"><div class="fill" id="fill" style="width:0"></div></div>
-    </section>
+<section class="band" id="alur">
+  <div class="wrap">
+    <div><h2>Dari lapangan sampai laporan</h2><p>Data dicatat di lapangan, dipantau lewat dashboard, lalu didokumentasikan di logbook B3. Semuanya dibuka dari satu portal.</p></div>
+    <div class="nums" id="nums"></div>
+  </div>
+</section>
 
-    <div class="tools">
-      <div class="chips" id="dayChips" aria-label="Pilih tanggal">
-        <button class="chip on" data-day="today">Hari ini</button>
-        <button class="chip" data-day="yesterday">Kemarin</button>
+<section class="s" id="tentang">
+  <div class="wrap two">
+    <div>
+      <h2>Perusahaan</h2>
+      <p class="lead">PT Prasadha Pamunah Limbah Industri (PPLI) adalah perusahaan Indonesia yang beroperasi sejak 1994, menyediakan layanan pengumpulan, daur ulang, pengolahan, dan pembuangan limbah B3 maupun non-B3.</p>
+      <p class="lead">Fasilitas utamanya berada di Desa Nambo, Kecamatan Klapanunggal, Kabupaten Bogor, Jawa Barat.</p>
+    </div>
+    <div class="own">
+      <h3>Kepemilikan saham</h3>
+      <div class="bar" role="img" aria-label="DOWA 95 persen, Pemerintah Indonesia 5 persen"><i class="a"></i><i class="b"></i></div>
+      <div class="rows">
+        <div><b>95%</b><span>DOWA</span></div>
+        <div class="r2"><b>5%</b><span>Pemerintah Indonesia melalui Kementerian BUMN</span></div>
       </div>
-      <div class="chips" id="chips">
-        <button class="chip on" data-f="all">Semua area</button>
-        <button class="chip" data-f="ok">Sudah lapor</button>
-        <button class="chip" data-f="bad">Belum lapor</button>
+    </div>
+  </div>
+</section>
+
+<section class="s vid" id="video">
+  <div class="wrap">
+    <h2>Video</h2>
+    <p class="sub" style="color:#b9d3c3">Klik video untuk memutarnya.</p>
+    <div class="vgrid" id="vgrid"></div>
+  </div>
+</section>
+
+<section class="s" id="grup">
+  <div class="wrap two">
+    <div>
+      <h2>Bagian dari DOWA Group</h2>
+      <p class="lead">Induk perusahaan PPLI adalah DOWA Eco-System Co., Ltd., perusahaan yang berfokus pada pengelolaan lingkungan dan daur ulang, dan merupakan anak perusahaan yang dimiliki penuh oleh DOWA Holdings Co., Ltd.</p>
+      <p class="lead">Grup ini berdiri pada 1884 di Jepang sebagai perusahaan penambangan dan peleburan atau pemurnian logam.</p>
+      <div class="chips"><span class="chip">Daur ulang sumber daya</span><span class="chip">Pengelolaan limbah</span><span class="chip">Remediasi tanah</span><span class="chip">Konsultasi lingkungan</span></div>
+    </div>
+    <div class="facts">
+      <div class="fact"><b>1884</b><span>DOWA Group berdiri di Jepang</span></div>
+      <div class="fact"><b>1994</b><span>PPLI mulai beroperasi</span></div>
+      <div class="fact"><b>B3</b><span>Limbah berbahaya dan beracun</span></div>
+      <div class="fact"><b>Non-B3</b><span>Limbah tidak berbahaya</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="s svc" id="layanan">
+  <div class="wrap">
+    <h2>Layanan</h2>
+    <p class="sub">Daftar layanan PPLI. Pilih salah satu untuk membaca penjelasan lengkapnya di situs resmi.</p>
+    <div class="tiles" id="tiles"></div>
+  </div>
+</section>
+
+
+<section class="s" id="proyek">
+  <div class="wrap">
+    <div class="two">
+      <div>
+        <h2>Proyek kami: PTFI Smelter Gresik</h2>
+        <p class="lead">PT Freeport Indonesia (PTFI) membangun dan mengoperasikan Smelter Manyar di Kawasan Ekonomi Khusus JIIPE, Gresik, Jawa Timur, sebagai bagian dari hilirisasi tembaga di Indonesia. Kapasitas pengolahannya mencapai 1,7 juta ton konsentrat tembaga per tahun.</p>
+        <p class="lead">PPLI hadir di lokasi ini untuk mendukung pengelolaan limbah operasional smelter, dari pencatatan di lapangan sampai dokumentasi limbah B3. Smelter memasuki tahap peningkatan produksi (ramp up) pada 2026.</p>
       </div>
-      <input type="search" id="q" placeholder="Cari area…">
+      <div class="illus"><svg viewBox="0 0 520 325" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ilustrasi kawasan smelter">
+<defs><linearGradient id="psky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#02261a"/><stop offset=".6" stop-color="#0b6a3d"/><stop offset="1" stop-color="#c8e883"/></linearGradient><linearGradient id="psm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity=".32"/></linearGradient></defs>
+<rect width="520" height="325" fill="url(#psky)"/><circle cx="380" cy="215" r="70" fill="#eefab4" opacity=".4"/>
+<path d="M0 220C80 190 170 215 260 200S430 185 520 205V325H0Z" fill="#128a4e" opacity=".8"/>
+<g fill="url(#psm)"><ellipse cx="318" cy="70" rx="30" ry="52"/><ellipse cx="368" cy="52" rx="36" ry="58"/><ellipse cx="420" cy="78" rx="26" ry="46"/></g>
+<g fill="#052a1b"><path d="M308 235L312 115H326L330 235Z"/><path d="M358 235L362 95H378L382 235Z"/><path d="M410 235L414 125H426L429 235Z"/><rect x="262" y="190" width="190" height="50"/><rect x="278" y="168" width="70" height="24"/><path d="M180 232L262 205V240H180Z"/></g>
+<g fill="#d3e8da"><rect x="96" y="190" width="44" height="52" rx="3"/><rect x="146" y="202" width="36" height="40" rx="3"/><ellipse cx="118" cy="190" rx="22" ry="6" fill="#eaf5ee"/><ellipse cx="164" cy="202" rx="18" ry="5" fill="#eaf5ee"/></g>
+<g fill="#a6d33a"><rect x="272" y="204" width="10" height="6"/><rect x="292" y="204" width="10" height="6"/><rect x="312" y="204" width="10" height="6"/><rect x="420" y="208" width="10" height="6"/></g>
+<path d="M0 262C110 242 230 266 340 252S470 244 520 256V325H0Z" fill="#064a2a"/>
+<g><rect x="240" y="262" width="46" height="22" fill="#a6d33a"/><rect x="290" y="262" width="46" height="22" fill="#eef7f1"/><rect x="340" y="262" width="46" height="22" fill="#00873d"/><rect x="390" y="262" width="46" height="22" fill="#a6d33a"/><rect x="265" y="240" width="46" height="22" fill="#00873d"/><rect x="315" y="240" width="46" height="22" fill="#eef7f1"/></g>
+<g><rect x="44" y="258" width="5" height="12" fill="#2c2a1a"/><circle cx="46" cy="250" r="14" fill="#22a05a"/><rect x="74" y="262" width="4" height="10" fill="#2c2a1a"/><circle cx="76" cy="256" r="10" fill="#1a8548"/></g>
+<rect y="296" width="520" height="29" fill="#032b1a"/></svg></div>
     </div>
 
-    <div class="tablebox"><table>
-      <thead><tr><th>Area sumber limbah</th><th>Status</th><th>Jam laporan (WIB)</th><th id="findingCountHeader">Jumlah finding hari ini</th><th>7 hari terakhir</th></tr></thead>
-      <tbody id="rows"></tbody>
-    </table></div>
-    <p class="foot" id="syncStatus" role="status" aria-live="polite">Menunggu data spreadsheet...</p>
-  </section>
+    <div class="pgrid">
+      <div class="fact"><b>1,7 juta</b><span>Ton konsentrat tembaga per tahun</span></div>
+      <div class="fact"><b>100 ha</b><span>Luas lahan proyek smelter</span></div>
+      <div class="fact"><b>JIIPE</b><span>Kawasan Ekonomi Khusus Gresik, Manyar</span></div>
+      <div class="fact"><b>Single line</b><span>Menurut PTFI, yang terbesar di dunia</span></div>
+    </div>
 
-  <section id="reportsView" role="tabpanel" aria-labelledby="tabReports" hidden>
-    <h1>Semua Pelaporan</h1>
-    <div class="tools">
-      <input type="search" id="reportQ" placeholder="Cari seluruh kolom laporan…">
-      <span class="foot" id="reportCount"></span>
+    <div class="ptag">
+      <div><strong>Produk utama</strong><span class="chip">Katoda tembaga</span><span class="chip">Emas dan perak batangan</span><span class="chip">Platinum group metals</span></div>
+      <div><strong>Produk samping</strong><span class="chip">Asam sulfat</span><span class="chip">Terak tembaga</span><span class="chip">Gipsum</span></div>
     </div>
-    <div class="report-filters" id="reportFilters">
-      <label>Tanggal dari<input type="date" id="reportDateFrom"></label>
-      <label>Tanggal sampai<input type="date" id="reportDateTo"></label>
-      <label>Nama pelapor<select id="reportReporter"><option value="">Semua pelapor</option></select></label>
-      <label>Lokasi temuan<select id="reportLocation"><option value="">Semua lokasi</option></select></label>
-      <label>Finding<select id="reportFinding"><option value="">Semua finding</option></select></label>
-      <label>Area sumber limbah<select id="reportArea"><option value="">Semua area</option></select></label>
-      <label>Bukti foto<select id="reportEvidence"><option value="">Semua</option><option value="yes">Ada bukti</option><option value="no">Tanpa bukti</option></select></label>
+
+    <div class="role">
+      <h3>Peran PPLI di PTFI Smelter Operation</h3>
+      <p class="sub" style="margin:0">Aplikasi di portal ini membantu operasional harian waste management di lokasi smelter.</p>
+      <div class="rgrid">
+        <a class="rc" href="#aplikasi"><b>Pencatatan di lapangan</b><span>RO Box Tracker dan Wastebin Tracker</span></a>
+        <a class="rc" href="#aplikasi"><b>Armada dan peralatan</b><span>Fleet &amp; Equipment Management</span></a>
+        <a class="rc" href="#aplikasi"><b>Pemantauan kinerja</b><span>Waste Monitoring</span></a>
+        <a class="rc" href="#aplikasi"><b>Dokumentasi limbah B3</b><span>Logbook B3 (segera hadir)</span></a>
+      </div>
     </div>
-    <div class="report-actions">
-      <button class="btn" id="resetReportFilters" type="button">Reset filter</button>
-      <span class="foot" id="reportStatus" role="status" aria-live="polite">Menunggu data pelaporan...</span>
+  </div>
+</section>
+
+<section class="s" id="kontak">
+  <div class="wrap two">
+    <div>
+      <h2>Profil perusahaan</h2>
+      <p class="lead">Unduh brosur profil perusahaan resmi PPLI dalam beberapa bahasa.</p>
+      <div class="dl">
+        <a class="btn pri" href="https://ppli.co.id/wp-content/uploads/2022/01/Company-Profile-PPLI.pdf" target="_blank" rel="noopener">English</a>
+        <a class="btn line" href="https://ppli.co.id/wp-content/uploads/2020/08/PPLI-Company-Profile_Japan-Version.pdf" target="_blank" rel="noopener">日本語</a>
+        <a class="btn line" href="https://ppli.co.id/wp-content/uploads/2022/01/Company-Profile-PPLI.pdf" target="_blank" rel="noopener">Bahasa Indonesia</a>
+      </div>
     </div>
-    <div class="tablebox"><table id="reportTable">
-      <thead id="reportHead"></thead>
-      <tbody id="reportRows"></tbody>
-    </table></div>
-  </section>
-</main>
+    <div class="find">
+      <h3>Fasilitas utama PPLI</h3>
+      <p>Jl. Raya Narogong, Desa Nambo<br>Kecamatan Klapanunggal<br>Bogor 16710, Indonesia</p>
+      <p><strong>Telepon:</strong> (+62-21) 867 4042<br><strong>Customer Service:</strong> (+62-21) 867 3333</p>
+      <a class="btn line" href="https://ppli.co.id/en/tentang-kami/perusahaan/" target="_blank" rel="noopener">Kunjungi ppli.co.id</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div><b>PPLI Operations Control</b>Portal ini hanya berisi tautan. Data tetap ada di masing-masing aplikasi.<br>Informasi perusahaan bersumber dari <a href="https://ppli.co.id/en/tentang-kami/perusahaan/" target="_blank" rel="noopener">ppli.co.id</a>.</div>
+    <div><h4>Aplikasi</h4><ul id="flinks"></ul></div>
+  </div>
+</footer>
 
 <script>
-var API_URL="https://script.google.com/macros/s/AKfycbxFmm9MdyLBBcc2zRb7PBv0yaGjD_uKdpdANVEf457WlVss0q7mjuAoUYRw7kJuDkf4/exec";
-var DATA=[],REPORTS=[],REPORT_HEADERS=[],HAS_REPORTS=false;
-var filter="all",selectedDay="today",$=function(i){return document.getElementById(i)};
+/* ===== Daftar aplikasi. Tambah aplikasi baru = satu baris di sini =====
+   url ''  : kartu tampil "Link menyusul" (belum bisa diklik)
+   status  : 'live' atau 'soon'
+   img     : (opsional) foto sendiri, mis. 'assets/robox.jpg'. Jika file tidak ada, ilustrasi dipakai. */
+const APPS = [
+  { name:'RO Box Tracker', desc:'Direktori dan inventaris container waste RO Box.', cat:'Operasional', art:'box', status:'live', url:'https://pplispv.github.io/robox/', img:'assets/robox.jpg' },
+  { name:'Wastebin Tracker', desc:'Identifikasi bin dan pencatatan temuan di lapangan.', cat:'Operasional', art:'bin', status:'live', url:'https://pplispv.github.io/Wastebin/', img:'assets/wbt.jpg' },
+  { name:'Fleet & Equipment Management', desc:'KM tracking, servis, laporan abnormal, dan monitoring dokumen armada.', cat:'Armada', art:'truck', status:'live', url:'https://pplispv.github.io/maintenance/', img:'assets/fleet.jpg' },
+  { name:'Waste Monitoring', desc:'Overview, waste insight, dan cost analysis Manyar Smelter & Refinery.', cat:'Dashboard', art:'chart', status:'live', url:'https://pplispv.github.io/wastemonitoring/', img:'assets/dashboard.jpg' },
+  { name:'Dashboard OneDrive', desc:'Dashboard yang disimpan di OneDrive, dibuka lewat link share.', cat:'Dashboard', art:'cloud', status:'soon', url:'', img:'assets/onedrive.jpg' },
+  { name:'Logbook B3', desc:'Pencatatan limbah B3 harian: masuk, simpan, dan keluar.', cat:'Kepatuhan', art:'book', status:'soon', url:'', img:'assets/logbook-b3.jpg' }
+];
 
-function escapeHTML(value){
-  return String(value==null?"":value).replace(/[&<>"']/g,function(ch){
-    return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch];
-  });
-}
-
-function toWibTime(value,sourceTimeZone){
-  var text=String(value==null?"":value);
-  if(!text||sourceTimeZone==="Asia/Jakarta"||sourceTimeZone!=="Asia/Jayapura")return text;
-  var full=/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2})(?::(\d{2}))?$/.exec(text);
-  if(full){
-    var date=new Date(Date.UTC(Number(full[1]),Number(full[2])-1,Number(full[3]),Number(full[4])-2,Number(full[5]),Number(full[6]||0)));
-    return [date.getUTCFullYear(),String(date.getUTCMonth()+1).padStart(2,"0"),String(date.getUTCDate()).padStart(2,"0")].join("-")+" "+
-      [String(date.getUTCHours()).padStart(2,"0"),String(date.getUTCMinutes()).padStart(2,"0"),String(date.getUTCSeconds()).padStart(2,"0")].join(":");
-  }
-  var clock=/^(\d{2}):(\d{2})$/.exec(text);
-  if(clock){
-    var minutes=(Number(clock[1])*60+Number(clock[2])-120+1440)%1440;
-    return String(Math.floor(minutes/60)).padStart(2,"0")+":"+String(minutes%60).padStart(2,"0");
-  }
-  return text;
-}
-
-function statusForDay(row){
-  if(selectedDay==="yesterday")return row.y||(row.w.length&&Number(row.w[row.w.length-1])?"Sudah":null);
-  return row.t;
-}
-function wibDateKey(offsetDays){
-  var parts=new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
-  var values={};
-  parts.forEach(function(part){values[part.type]=part.value});
-  var date=new Date(Date.UTC(Number(values.year),Number(values.month)-1,Number(values.day)+(offsetDays||0)));
-  return [date.getUTCFullYear(),String(date.getUTCMonth()+1).padStart(2,"0"),String(date.getUTCDate()).padStart(2,"0")].join("-");
-}
-function updateDateLabels(){
-  var dateParts=wibDateKey(selectedDay==="yesterday"?-1:0).split("-");
-  var date=new Date(Date.UTC(Number(dateParts[0]),Number(dateParts[1])-1,Number(dateParts[2]),12));
-  var label=selectedDay==="yesterday"?"kemarin":"hari ini";
-  $("today").textContent=new Intl.DateTimeFormat("id-ID",{timeZone:"Asia/Jakarta",weekday:"long",day:"numeric",month:"long",year:"numeric"}).format(date);
-  $("pageTitle").textContent="Status Laporan per Area "+(selectedDay==="yesterday"?"Kemarin":"Hari Ini");
-  $("okLabel").textContent="Sudah lapor "+label;
-  $("badLabel").textContent="Belum lapor "+label;
-  $("complianceLabel").textContent="Kepatuhan pelaporan "+label;
-  $("findingCountHeader").textContent="Jumlah finding "+label;
+const W='#fff', G='#a6d33a', F='#0a6b3c', L='#eaf5ee';
+const ART = {
+ box:`<rect x="50" y="76" width="84" height="42" fill="${G}"/><rect x="140" y="76" width="84" height="42" fill="${L}"/><rect x="95" y="34" width="84" height="42" fill="#00873d"/><rect x="230" y="76" width="50" height="42" fill="${G}" opacity=".85"/><path d="M62 80v34M76 80v34M90 80v34M152 80v34M166 80v34M180 80v34M107 38v34M121 38v34M135 38v34" stroke="#032b1a" stroke-opacity=".28" stroke-width="3"/>`,
+ bin:`<rect x="104" y="40" width="74" height="10" rx="3" fill="${L}"/><rect x="110" y="50" width="62" height="68" rx="6" fill="${W}"/><path d="M127 60v48M141 60v48M155 60v48" stroke="#032b1a" stroke-opacity=".2" stroke-width="4"/><rect x="196" y="66" width="52" height="52" rx="5" fill="${G}"/><rect x="192" y="60" width="60" height="9" rx="3" fill="#c4e46a"/>`,
+ truck:`<rect x="52" y="52" width="130" height="62" rx="4" fill="${L}"/><path d="M186 70h42l28 26v18h-70z" fill="${G}"/><rect x="198" y="76" width="26" height="16" fill="#032b1a" opacity=".55"/><circle cx="92" cy="118" r="14" fill="#032b1a"/><circle cx="92" cy="118" r="6" fill="${W}"/><circle cx="224" cy="118" r="14" fill="#032b1a"/><circle cx="224" cy="118" r="6" fill="${W}"/><path d="M66 70h100M66 84h100" stroke="#032b1a" stroke-opacity=".18" stroke-width="3"/>`,
+ chart:`<rect x="60" y="82" width="28" height="36" fill="${L}"/><rect x="102" y="62" width="28" height="56" fill="#00873d"/><rect x="144" y="74" width="28" height="44" fill="${L}"/><rect x="186" y="44" width="28" height="74" fill="#00873d"/><rect x="228" y="56" width="28" height="62" fill="${L}"/><path d="M54 76L116 52l42 14 42-30 56 10" fill="none" stroke="${G}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>`,
+ cloud:`<path d="M96 112a26 26 0 010-52 38 38 0 0173-10 30 30 0 0129 62z" fill="${W}"/><path d="M160 98V70m-12 12l12-14 12 14" stroke="#00873d" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="214" y="84" width="46" height="30" rx="4" fill="${G}"/>`,
+ book:`<path d="M70 44h80v74H70z" fill="${W}"/><path d="M150 44h80v74h-80z" fill="${L}"/><path d="M84 62h54M84 76h54M84 90h40M164 62h54M164 76h54M164 90h40" stroke="#032b1a" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/><rect x="248" y="64" width="36" height="54" rx="4" fill="${G}"/><path d="M248 80h36M248 100h36" stroke="#3d5a0a" stroke-width="3"/>`
+};
+/* dekor lingkungan: turbin angin dan pohon di latar belakang */
+const ECO = `<g opacity=".55"><path d="M26 112L27 52h2l1 60z" fill="#fff"/><g transform="translate(28 52)"><path id="b" d="M-1 0L0-26L1 0z" fill="#fff"/><use href="#b" transform="rotate(120)"/><use href="#b" transform="rotate(240)"/></g><circle cx="296" cy="100" r="11" fill="#7fd08f"/><rect x="294" y="108" width="4" height="12" fill="#23422f"/></g>`;
+const TONE = { Operasional:['#05452a','#13975b'], Armada:['#052e2f','#17847a'], Dashboard:['#082b1d','#2f8f50'], Kepatuhan:['#1e3a0b','#7db524'] };
+function banner(a,i){
+  const [c1,c2] = TONE[a.cat] || TONE.Operasional;
+  const img = a.img ? `<img src="${a.img}" alt="" loading="lazy" onerror="this.remove()">` : '';
+  return `<div class="banner"><svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><linearGradient id="g${i}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="320" height="200" fill="url(#g${i})"/><circle cx="268" cy="44" r="40" fill="#fff" opacity=".08"/><g transform="translate(0 30)">${ECO}</g><path d="M0 160C70 140 130 160 200 148S290 138 320 150V200H0Z" fill="#000" opacity=".22"/><g transform="translate(0 22)">${ART[a.art]}</g></svg>${img}</div>`;
 }
 
-function findingCountForDay(row){
-  var count=selectedDay==="yesterday"?row.cy:row.c;
-  if(typeof count==="number")return count;
-  var dateKey=wibDateKey(selectedDay==="yesterday"?-1:0);
-  var areaName=String(row.n||"").trim().toLowerCase().replace(/\s+/g," ");
-  return REPORTS.filter(function(report){
-    return reportValue(report,"Tanggal Pelaporan").slice(0,10)===dateKey &&
-      reportValue(report,"Area Sumber Limbah").toLowerCase().replace(/\s+/g," ")===areaName;
-  }).length;
-}
+const $ = id => document.getElementById(id);
+const cats = ['Semua', ...new Set(APPS.map(a=>a.cat))];
+let activeCat = 'Semua';
+const isOpen = a => a.url && a.status==='live';
 
-function render(){
-  var ok=DATA.filter(function(row){return !!statusForDay(row)}).length;
-  var all=DATA.length,pct=all?Math.round(ok/all*100):0;
-  $("nOk").textContent=ok;$("nBad").textContent=all-ok;$("nAll").textContent=all;
-  $("pct").textContent=pct+"%";$("fill").style.width=pct+"%";
-  var q=$("q").value.toLowerCase();
-  var list=DATA.filter(function(row){
-    var status=statusForDay(row);
-    if(filter==="ok"&&!status)return false;
-    if(filter==="bad"&&status)return false;
-    return String(row.n||"").toLowerCase().indexOf(q)>-1;
-  });
-  $("rows").innerHTML=list.length?list.map(function(row){
-    var status=statusForDay(row);
-    var days=row.w.map(function(value){return '<span class="d '+(value?'y':'n')+'"></span>'}).join("")+'<span class="d '+(row.t?'y':'')+'"></span>';
-    return '<tr><td class="name">'+escapeHTML(row.n)+'</td><td><span class="badge '+(status?'ok">Sudah lapor':'bad">Belum lapor')+'</span></td><td>'+escapeHTML(status||"–")+'</td><td>'+findingCountForDay(row)+'</td><td><div class="week">'+days+'</div></td></tr>';
-  }).join(""):'<tr><td colspan="5" style="text-align:center;color:var(--muted)">Tidak ada data</td></tr>';
-}
+$('nums').innerHTML = [
+  [APPS.length,'Aplikasi dalam portal'],
+  [APPS.filter(isOpen).length,'Siap dibuka'],
+  [APPS.filter(a=>a.status==='soon').length,'Segera hadir']
+].map(s=>`<div class="num"><b>${s[0]}</b><span>${s[1]}</span></div>`).join('');
 
-function reportCell(value,header){
-  var text=String(value==null?"":value);
-  if(!text)return "–";
-  if(/bukti|foto/i.test(header)){
-    var links=text.match(/https?:\/\/[^\s,]+/gi);
-    if(links&&links.length){
-      return links.map(function(url,index){
-        return '<a href="'+escapeHTML(url)+'" target="_blank" rel="noopener">Foto '+(index+1)+'</a>';
-      }).join(" · ");
-    }
-  }
-  return escapeHTML(text);
-}
+$('flinks').innerHTML = APPS.filter(isOpen).map(a=>`<li><a href="${a.url}" target="_blank" rel="noopener">${a.name}</a></li>`).join('');
 
-function normalizedHeader(value){
-  return String(value||"").trim().toLowerCase().replace(/\s+/g," ");
-}
-
-function reportValue(report,expectedHeader){
-  var expected=normalizedHeader(expectedHeader);
-  for(var i=0;i<REPORT_HEADERS.length;i++){
-    var header=REPORT_HEADERS[i];
-    if(normalizedHeader(header)===expected){
-      var value=report[header];
-      return String(value==null?"":value).trim();
-    }
-  }
-  return "";
-}
-
-function populateReportSelect(selectId,headerName,defaultLabel){
-  var select=$(selectId),values={};
-  REPORTS.forEach(function(report){
-    var value=reportValue(report,headerName);
-    if(value)values[value]=true;
-  });
-  var selected=select.value;
-  var options=Object.keys(values).sort().map(function(value){
-    return '<option value="'+escapeHTML(value)+'">'+escapeHTML(value)+'</option>';
-  }).join("");
-  select.innerHTML='<option value="">'+escapeHTML(defaultLabel)+'</option>'+options;
-  if(values[selected])select.value=selected;
-}
-
-function populateReportFilters(){
-  populateReportSelect("reportReporter","Nama Pelapor","Semua pelapor");
-  populateReportSelect("reportLocation","Lokasi Temuan","Semua lokasi");
-  populateReportSelect("reportFinding","Apa finding / Temuan abnormalitas yang terjadi","Semua finding");
-  populateReportSelect("reportArea","Area Sumber Limbah","Semua area");
-}
-
-function renderReports(){
-  var q=$("reportQ").value.toLowerCase();
-  if(!HAS_REPORTS||!REPORT_HEADERS.length){
-    $("reportHead").innerHTML="";
-    $("reportRows").innerHTML='<tr><td style="text-align:center;color:var(--muted)">Data semua pelaporan belum tersedia dari endpoint. Deploy Apps Script terbaru.</td></tr>';
-    $("reportCount").textContent="";
-    return;
-  }
-  var dateFrom=$("reportDateFrom").value,dateTo=$("reportDateTo").value;
-  var reporter=$("reportReporter").value,location=$("reportLocation").value;
-  var finding=$("reportFinding").value,area=$("reportArea").value;
-  var evidence=$("reportEvidence").value;
-  var list=REPORTS.filter(function(report){
-    var reportDate=reportValue(report,"Tanggal Pelaporan").slice(0,10);
-    var reportName=reportValue(report,"Nama Pelapor");
-    var reportLocation=reportValue(report,"Lokasi Temuan");
-    var reportFinding=reportValue(report,"Apa finding / Temuan abnormalitas yang terjadi");
-    var reportArea=reportValue(report,"Area Sumber Limbah");
-    var reportEvidence=reportValue(report,"Bukti / Foto (Jika ada)");
-    if(dateFrom&&(!reportDate||reportDate<dateFrom))return false;
-    if(dateTo&&(!reportDate||reportDate>dateTo))return false;
-    if(reporter&&reportName!==reporter)return false;
-    if(location&&reportLocation!==location)return false;
-    if(finding&&reportFinding!==finding)return false;
-    if(area&&reportArea!==area)return false;
-    if(evidence==="yes"&&!reportEvidence)return false;
-    if(evidence==="no"&&reportEvidence)return false;
-    return REPORT_HEADERS.map(function(header){return String(report[header]||"")}).join(" ").toLowerCase().indexOf(q)>-1;
-  });
-  $("reportHead").innerHTML="<tr>"+REPORT_HEADERS.map(function(header){return "<th>"+escapeHTML(header)+"</th>"}).join("")+"</tr>";
-  $("reportRows").innerHTML=list.length?list.map(function(report){
-    return "<tr>"+REPORT_HEADERS.map(function(header){return "<td>"+reportCell(report[header],header)+"</td>"}).join("")+"</tr>";
-  }).join(""):'<tr><td colspan="'+REPORT_HEADERS.length+'" style="text-align:center;color:var(--muted)">Tidak ada laporan</td></tr>';
-  $("reportCount").textContent=list.length+" laporan ditemukan";
-  $("reportStatus").textContent="Menampilkan "+list.length+" dari "+REPORTS.length+" laporan";
-}
-
-function activateTab(showReports){
-  $("areaView").hidden=showReports;
-  $("reportsView").hidden=!showReports;
-  $("tabAreas").classList.toggle("on",!showReports);
-  $("tabReports").classList.toggle("on",showReports);
-  $("tabAreas").setAttribute("aria-selected",String(!showReports));
-  $("tabReports").setAttribute("aria-selected",String(showReports));
-  if(showReports)renderReports();
-}
-
-$("dayChips").addEventListener("click",function(event){
-  var button=event.target.closest(".chip");if(!button)return;
-  selectedDay=button.dataset.day;
-  [].forEach.call($("dayChips").querySelectorAll(".chip"),function(chip){chip.classList.toggle("on",chip===button)});
-  updateDateLabels();render();
-});
-$("chips").addEventListener("click",function(event){
-  var button=event.target.closest(".chip");if(!button)return;
-  filter=button.dataset.f;
-  [].forEach.call($("chips").querySelectorAll(".chip"),function(chip){chip.classList.toggle("on",chip===button)});
+$('tabs').innerHTML = cats.map(c=>`<button class="tab" type="button" data-c="${c}" aria-pressed="${c===activeCat}">${c}</button>`).join('');
+$('tabs').addEventListener('click', e=>{
+  const b = e.target.closest('.tab'); if(!b) return;
+  activeCat = b.dataset.c;
+  document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-pressed', x===b));
   render();
 });
-$("tabAreas").addEventListener("click",function(){activateTab(false)});
-$("tabReports").addEventListener("click",function(){activateTab(true)});
-$("q").addEventListener("input",render);
-$("reportQ").addEventListener("input",renderReports);
-[
-  "reportDateFrom","reportDateTo","reportReporter","reportLocation",
-  "reportFinding","reportArea","reportEvidence"
-].forEach(function(id){$(id).addEventListener("input",renderReports);$(id).addEventListener("change",renderReports)});
-$("resetReportFilters").addEventListener("click",function(){
-  ["reportDateFrom","reportDateTo","reportReporter","reportLocation","reportFinding","reportArea","reportEvidence","reportQ"]
-    .forEach(function(id){$(id).value=""});
-  renderReports();
-});
-$("refresh").addEventListener("click",loadData);
-updateDateLabels();
+$('q').addEventListener('input', render);
 
-function loadData(){
-  var button=$("refresh");
-  button.disabled=true;
-  button.textContent="Memuat...";
-  $("syncStatus").textContent="Mengambil data dari spreadsheet...";
-  $("syncStatus").style.color="";
-  var callbackName="__wasteMonitoring"+Date.now();
-  var script=document.createElement("script");
-  var finished=false,received=false;
-  var timeout=setTimeout(function(){fail("Waktu tunggu habis saat menghubungi Apps Script.");},15000);
-  function cleanup(){
-    if(finished)return;
-    finished=true;
-    clearTimeout(timeout);
-    delete window[callbackName];
-    if(script.parentNode)script.parentNode.removeChild(script);
-    button.disabled=false;
-    button.textContent="Perbarui data";
+const GO = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+function render(){
+  const q = $('q').value.trim().toLowerCase();
+  const list = APPS.map((a,i)=>({a,i})).filter(({a}) =>
+    (activeCat==='Semua' || a.cat===activeCat) &&
+    (!q || (a.name+' '+a.desc+' '+a.cat).toLowerCase().includes(q)));
+  if(!list.length){
+    $('grid').innerHTML = '<div class="empty"><b>Aplikasi tidak ditemukan</b>Coba kata kunci lain atau pilih kategori Semua.</div>';
+    return;
   }
-  function fail(message){
-    DATA=[];
-    REPORTS=[];REPORT_HEADERS=[];HAS_REPORTS=false;
-    render();
-    renderReports();
-    $("syncStatus").textContent="Gagal memuat data: "+message;
-    $("syncStatus").style.color="var(--bad)";
-    cleanup();
-  }
-  window[callbackName]=function(payload){
-    received=true;
-    try{
-      if(!payload||!payload.ok)throw new Error(payload&&payload.error?payload.error:"Apps Script mengembalikan error.");
-      if(!Array.isArray(payload.data))throw new Error("Format respons tidak memiliki daftar data.");
-      var sourceTimeZone=payload.timeZone||"Asia/Jayapura";
-      if(payload.groupBy==="area"){
-        DATA=payload.data.map(function(row){
-          return {
-            n:String(row.n||""),
-            t:row.t?toWibTime(row.t,sourceTimeZone):null,
-            y:row.y?toWibTime(row.y,sourceTimeZone):null,
-            c:typeof row.c==="number"?row.c:null,
-            cy:typeof row.cy==="number"?row.cy:null,
-            w:Array.isArray(row.w)?row.w.map(function(day){return Number(day)?1:0;}):[]
-          };
-        });
-      }else{
-        var grouped={};
-        payload.data.forEach(function(row){
-          var parts=String(row.a||"").split("/");
-          var areaName=String(parts.shift()||"").trim();
-          if(!areaName)return;
-          var key=areaName.toLowerCase().replace(/\s+/g," ");
-          var area=grouped[key]||{n:areaName,t:null,y:null,c:null,cy:null,w:[]};
-          var time=row.t?toWibTime(row.t,sourceTimeZone):null;
-          if(time&&(!area.t||area.t==="Sudah"||time>area.t))area.t=time;
-          if(Array.isArray(row.w))row.w.forEach(function(day,index){
-            area.w[index]=(Number(area.w[index])||Number(day))?1:0;
-          });
-          if(Array.isArray(row.w)&&Number(row.w[row.w.length-1]))area.y="Sudah";
-          grouped[key]=area;
-        });
-        DATA=Object.keys(grouped).map(function(key){
-          return grouped[key];
-        });
-      }
-      HAS_REPORTS=Array.isArray(payload.reports);
-      REPORT_HEADERS=Array.isArray(payload.reportHeaders)?payload.reportHeaders.map(String):[];
-      REPORTS=HAS_REPORTS?payload.reports.map(function(report){
-        var normalized={};
-        Object.keys(report).forEach(function(header){
-          normalized[header]=normalizedHeader(header)==="timestamp"
-            ?toWibTime(report[header],sourceTimeZone)
-            :report[header];
-        });
-        return normalized;
-      }):[];
-      populateReportFilters();
-      render();
-      renderReports();
-      $("syncStatus").textContent="Tersambung"+(payload.updated?". Diperbarui: "+toWibTime(payload.updated,sourceTimeZone)+" WIB":"");
-      $("syncStatus").style.color="var(--ok)";
-      cleanup();
-    }catch(error){fail(error.message);}
-  };
-  script.onerror=function(){fail("Endpoint masih mengirim JSON biasa. Pasang MonitoringInputHarian.gs di Apps Script dan deploy versi baru.");};
-  script.onload=function(){
-    if(!received)fail("Endpoint belum mendukung JSONP. Perbarui kode Apps Script dan deploy ulang.");
-  };
-  script.src=API_URL+"?callback="+encodeURIComponent(callbackName)+"&t="+Date.now();
-  document.head.appendChild(script);
+  $('grid').innerHTML = list.map(({a,i})=>{
+    const open = isOpen(a);
+    const state = open ? 'Aktif' : (a.status==='soon' ? 'Segera hadir' : 'Link menyusul');
+    const inner = `${banner(a,i).replace('<div class="banner">','<div class="banner"><span class="badge"><i></i>'+state+'</span>')}
+      <div class="body"><small>${a.cat}</small><h3>${a.name}</h3><p>${a.desc}</p>
+      <div class="open">${open?`<span class="c">${GO}</span><span>Buka aplikasi</span>`:`<span>${a.status==='soon'?'Dalam persiapan':'Link belum diisi'}</span>`}</div></div>`;
+    return open
+      ? `<a class="card" href="${a.url}" target="_blank" rel="noopener">${inner}</a>`
+      : `<div class="card soon" aria-disabled="true">${inner}</div>`;
+  }).join('');
 }
+render();
 
-loadData();
+/* ===== Video & layanan (bagian Tentang) ===== */
+
+/* ===== Video YouTube =====
+   Ubah judul atau tambah video di daftar ini. id = kode setelah v= (atau setelah youtu.be/) */
+const VIDEOS = [
+  { id:'IxVrwa6wpHg', title:'Video 1' },
+  { id:'FG_V9HXf56s', title:'Video 2' }
+];
+const PLAY = '<svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+const vgrid = document.getElementById('vgrid');
+vgrid.innerHTML = VIDEOS.map((v,i)=>`<div class="vcard"><div class="frame" data-i="${i}"></div><div class="vmeta"><span>${v.title}</span><a class="vopen" href="https://www.youtube.com/watch?v=${v.id}" target="_blank" rel="noopener">Buka di YouTube</a></div></div>`).join('');
+vgrid.querySelectorAll('.frame').forEach(f=>{
+  const v = VIDEOS[+f.dataset.i];
+  f.innerHTML = `<button class="poster" type="button" aria-label="Putar ${v.title}" style="background-image:linear-gradient(rgba(3,43,26,.3),rgba(3,43,26,.6)),url(https://i.ytimg.com/vi/${v.id}/hqdefault.jpg);background-size:cover;background-position:center"><div class="play">${PLAY}</div></button>`;
+  f.firstChild.addEventListener('click', () => {
+    f.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0" title="${v.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+  });
+});
+
+const SVC = [
+  ['Profil limbah','profil-limbah'],['Waste to energy','energi-dari-limbah'],['Proses pra-penerimaan','proses-pra-penerimaan'],
+  ['Eco-landfill','tempat-pembuangan-limbah-ramah-lingkungan'],['Transportasi limbah','transportasi-limbah'],['Servis lapangan','servis-lapangan'],
+  ['Pengolahan limbah padat','pengolahan-limbah-padat'],['Pengolahan limbah cair','pengolahan-limbah-cair'],['Pengolahan limbah lanjutan','pengolahan-limbah-lanjutan'],
+  ['Pengolahan limbah medis','pengolahan-limbah-medis'],['Pengolahan limbah PCBs','pengolahan-limbah-pcbs'],['Pengolahan dengan insinerasi','pengolahan-limbah-dengan-insinerasi']
+];
+const ARR = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M8 7h9v9"/></svg>';
+document.getElementById('tiles').innerHTML = SVC.map(s=>`<a class="tile" href="https://ppli.co.id/en/layanan/${s[1]}/" target="_blank" rel="noopener"><span>${s[0]}</span>${ARR}</a>`).join('');
 </script>
 </body>
 </html>
