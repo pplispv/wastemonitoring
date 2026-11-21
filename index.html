@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>PPLI Operations Control</title>
 <meta name="theme-color" content="#032b1a">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -472,7 +473,7 @@ vgrid.querySelectorAll('.frame').forEach(f=>{
   const v = VIDEOS[+f.dataset.i];
   f.innerHTML = `<button class="poster" type="button" aria-label="Putar ${v.title}" style="background-image:linear-gradient(rgba(3,43,26,.3),rgba(3,43,26,.6)),url(https://i.ytimg.com/vi/${v.id}/hqdefault.jpg);background-size:cover;background-position:center"><div class="play">${PLAY}</div></button>`;
   f.firstChild.addEventListener('click', () => {
-    f.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0" title="${v.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+    f.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${v.id}?autoplay=1&rel=0" title="${v.title}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>`;
   });
 });
 
